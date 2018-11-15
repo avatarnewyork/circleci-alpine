@@ -4,19 +4,19 @@ From alpine:3.8
 
 LABEL com.circleci.preserve-entrypoint=true
 
+ENV DOCKER_VERSION_OVERRIDE=$DOCKER_VERSION_OVERRIDE \
+    DOCKER_COMPOSE_VERSION_OVERRIDE=$DOCKER_COMPOSE_VERSION_OVERRIDE
+
 RUN apk update
-RUN apk add --no-cache bash curl git openssh tar gzip ca-certificates python
+RUN apk add --no-cache bash curl git openssh tar gzip ca-certificates python py-pip
 
 # INSTALL docker client / docker-compose
 RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.com/linux/static/edge/x86_64/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
     tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
-    mv /tmp/docker/* /usr/bin; \
-    curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION_OVERRIDE/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose; \
-    chmod +x /usr/local/bin/docker-compose;
+    mv /tmp/docker/* /usr/bin; 
 
-# INSTALL awscli
-RUN  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; \
-    python get-pip.py; \
-    pip install awscli --upgrade;
+# Python packages awscli docker-compose
+RUN pip install awscli docker-compose --upgrade;
+    
 
 ENTRYPOINT bash
