@@ -17,7 +17,10 @@ RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.
     mv /tmp/docker/* /usr/bin; \
     rm -rf /tmp/*
 
-# Python packages awscli docker-compose
-RUN pip --no-cache-dir install --upgrade pip && pip --no-cache-dir install awscli "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade;
+# Python packages awscli docker-compose runscope
+RUN pip --no-cache-dir install --upgrade pip \
+    && pip --no-cache-dir install awscli "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
+    && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
+    && wget -O /usr/bin/runscope.py https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/app.py
 
 ENTRYPOINT bash
