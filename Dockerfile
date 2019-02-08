@@ -1,4 +1,4 @@
-From alpine:3.8
+From alpine:3.9
 ARG DOCKER_VERSION_OVERRIDE=18.06.0-ce
 ARG DOCKER_COMPOSE_OVERRIDE=1.23.1
 
@@ -9,7 +9,7 @@ ENV DOCKER_COMPOSE_OVERRIDE=$DOCKER_COMPOSE_OVERRIDE
 
 COPY bashrc /root/.bashrc
 
-RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip
+RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip php php-mbstring php-json php-openssl
 
 # INSTALL docker client / docker-compose
 RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.com/linux/static/edge/x86_64/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
