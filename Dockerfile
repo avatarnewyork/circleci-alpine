@@ -9,7 +9,7 @@ ENV DOCKER_COMPOSE_OVERRIDE=$DOCKER_COMPOSE_OVERRIDE
 
 COPY bashrc /root/.bashrc
 
-RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip php php-mbstring php-json php-openssl
+RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip php php-mbstring php-json php-openssl php-phar
 
 # INSTALL docker client / docker-compose
 RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.com/linux/static/edge/x86_64/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
