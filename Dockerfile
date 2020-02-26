@@ -11,13 +11,15 @@ COPY bashrc /root/.bashrc
 
 RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip php php-mbstring php-json php-openssl php-phar jq
 
-# INSTALL docker client / docker-compose
+# INSTALL docker client / docker-compose / phpunit
 RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.com/linux/static/edge/x86_64/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
-    tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
-    mv /tmp/docker/* /usr/bin; \
-    rm -rf /tmp/*
+	tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
+	mv /tmp/docker/* /usr/bin; \
+	rm -rf /tmp/*; \
+	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.0.phar; \
+	chmod +x /usr/bin/phpunit.phar;
 
-# Python packages awscli docker-compose runscope
+# Python packages awscli docker-compose runscope 
 RUN pip --no-cache-dir install --upgrade pip \
     && pip --no-cache-dir install awscli "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
     && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
