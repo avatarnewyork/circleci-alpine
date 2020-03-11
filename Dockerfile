@@ -18,6 +18,7 @@ RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.
 	tar -xz -C /tmp -f /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
 	mv /tmp/docker/* /usr/bin; \
 	rm -rf /tmp/*; \
+	wget -O /usr/bin/junitfy.py https://raw.githubusercontent.com/avatarnewyork/junitfy/master/junitfy.py; \
 	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.0.phar; \
 	chmod +x /usr/bin/phpunit.phar; \
         cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet;
@@ -113,7 +114,7 @@ RUN apk upgrade --no-cache --update-cache --available && \
 
 # Python packages awscli docker-compose runscope 
 RUN pip --no-cache-dir install --upgrade pip \
-    && pip --no-cache-dir install awscli "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
+    && pip --no-cache-dir install awscli junit_xml_output "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
     && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
     && wget -O /usr/bin/runscope.py https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/app.py
 
