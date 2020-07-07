@@ -1,6 +1,8 @@
-From alpine:3.11.3
-ARG DOCKER_VERSION_OVERRIDE=18.06.0-ce
-ARG DOCKER_COMPOSE_OVERRIDE=1.23.1
+From alpine:3.12
+#ARG DOCKER_VERSION_OVERRIDE=18.06.0-ce
+ARG DOCKER_VERSION_OVERRIDE=19.03.08-ce
+#ARG DOCKER_COMPOSE_OVERRIDE=1.23.1
+ARG DOCKER_COMPOSE_OVERRIDE=1.25.5
 
 LABEL com.circleci.preserve-entrypoint=true
 
@@ -11,7 +13,7 @@ ENV DOCKER_VERSION_OVERRIDE=$DOCKER_VERSION_OVERRIDE \
 
 COPY bashrc /root/.bashrc
 
-RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python py-pip php php-mbstring php-json php-openssl php-phar jq
+RUN apk --no-cache add --update bash curl git openssh openssl tar gzip ca-certificates gettext python3 php php-mbstring php-json php-openssl php-phar jq
 
 # INSTALL docker client / docker-compose / phpunit
 RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.com/linux/static/edge/x86_64/docker-$DOCKER_VERSION_OVERRIDE.tgz; \
@@ -19,7 +21,7 @@ RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.
 	mv /tmp/docker/* /usr/bin; \
 	rm -rf /tmp/*; \
 	wget -O /usr/bin/junitfy.py https://raw.githubusercontent.com/avatarnewyork/junitfy/master/junitfy.py; \
-	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.0.phar; \
+	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.2.5.phar; \
 	chmod +x /usr/bin/phpunit.phar; \
         cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet;
 
@@ -30,6 +32,7 @@ RUN apk upgrade --no-cache --update-cache --available && \
     patch && \
     apk --no-cache add --update \
     --repository "$ALPINE_REPO_MIRROR/community" \
+    py3-pip \
     php7 \
     php7-igbinary \
     php7-bcmath \
@@ -111,11 +114,15 @@ RUN apk upgrade --no-cache --update-cache --available && \
     mailx \
     ncurses 
 
+RUN apk --no-cache add --update py3-wheel gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make
 
-# Python packages awscli docker-compose runscope 
-RUN pip --no-cache-dir install --upgrade pip \
-    && pip --no-cache-dir install awscli junit_xml_output "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
+# Python packages: junit awscli
+# removed run scope from PHP 7.4 releases
+#RUN pip --no-cache-dir install --upgrade pip \
+RUN pip --no-cache-dir install awscli junit_xml_output "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
     && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
     && wget -O /usr/bin/runscope.py https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/app.py
+
+RUN apk del gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make
 
 ENTRYPOINT bash
