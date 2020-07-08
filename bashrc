@@ -11,3 +11,5 @@ else
     export AWS_DEFAULT_REGION=$DEPLOY_STAGE_REGION
     export DEPLOY_ENVIRONMENT=$DEPLOY_STAGE_ENVIRONMENT
 fi
+
+alias python=python3
