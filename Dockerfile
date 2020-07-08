@@ -1,4 +1,4 @@
-From alpine:3.12
+From alpine:edge
 #ARG DOCKER_VERSION_OVERRIDE=18.06.0-ce
 ARG DOCKER_VERSION_OVERRIDE=19.03.8
 #ARG DOCKER_COMPOSE_OVERRIDE=1.23.1
@@ -8,7 +8,8 @@ LABEL com.circleci.preserve-entrypoint=true
 
 ENV DOCKER_VERSION_OVERRIDE=$DOCKER_VERSION_OVERRIDE \
     DOCKER_COMPOSE_OVERRIDE=$DOCKER_COMPOSE_OVERRIDE \
-    ALPINE_REPO_MIRROR="http://dl-cdn.alpinelinux.org/alpine/v$ALPINE_MAJOR" \
+	#ALPINE_REPO_MIRROR="http://dl-cdn.alpinelinux.org/alpine/v$ALPINE_MAJOR" \
+    ALPINE_REPO_MIRROR="http://dl-cdn.alpinelinux.org/alpine/edge" \
     ALPINE_TESTING_REPO_MIRROR="http://dl-cdn.alpinelinux.org/alpine/edge" 
 
 COPY bashrc /root/.bashrc
@@ -75,7 +76,7 @@ RUN apk upgrade --no-cache --update-cache --available && \
     php7-sockets \
     #php7-solr
     php7-tokenizer \
-    php7-wddx \
+    #php7-wddx \
     php7-xml \
     php7-xmlreader \
     php7-xmlwriter \
