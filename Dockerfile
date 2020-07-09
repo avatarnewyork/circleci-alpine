@@ -24,7 +24,8 @@ RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.
 	wget -O /usr/bin/junitfy.py https://raw.githubusercontent.com/avatarnewyork/junitfy/master/junitfy.py; \
 	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.2.5.phar; \
 	chmod +x /usr/bin/phpunit.phar; \
-        cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet;
+	cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet; \
+	ln -s /usr/bin/python3 /usr/bin/python;
 
 # leave out php7-solr, php7-stats, php7-session
 RUN apk upgrade --no-cache --update-cache --available && \
