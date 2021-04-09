@@ -1,4 +1,6 @@
-From alpine:edge
+#From alpine:edge
+FROM php:8.0.3-fpm-alpine3.13
+
 #ARG DOCKER_VERSION_OVERRIDE=18.06.0-ce
 ARG DOCKER_VERSION_OVERRIDE=19.03.8
 #ARG DOCKER_COMPOSE_OVERRIDE=1.23.1
@@ -22,109 +24,62 @@ RUN curl -L -o /tmp/docker-$DOCKER_VERSION_OVERRIDE.tgz https://download.docker.
 	mv /tmp/docker/* /usr/bin; \
 	rm -rf /tmp/*; \
 	wget -O /usr/bin/junitfy.py https://raw.githubusercontent.com/avatarnewyork/junitfy/master/junitfy.py; \
-	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.2.5.phar; \
+	wget -O /usr/bin/phpunit.phar https://phar.phpunit.de/phpunit-9.5.4.phar; \
 	chmod +x /usr/bin/phpunit.phar; \
-	cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet; \
+	#cd /usr/bin; wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet; \
 	ln -s /usr/bin/python3 /usr/bin/python;
 
-# leave out php7-solr, php7-stats, php7-session
-RUN apk upgrade --no-cache --update-cache --available && \
-    apk --no-cache add --update --repository "$ALPINE_REPO_MIRROR/main" \
-    icu-libs \
-    patch && \
-    apk --no-cache add --update \
-    --repository "$ALPINE_REPO_MIRROR/community" \
-    py3-pip \
-    php7 \
-    php7-igbinary \
-    php7-bcmath \
-    php7-calendar \
-    php7-cli \
-    php7-ctype \
-    php7-curl \
-    php7-common \
-    php7-dom \
-    php7-exif \
-    php7-fileinfo \
-    php7-fpm \        
-    php7-ftp \
-    php7-gd \
-    php7-gettext \
-    php7-gmp \
-    php7-iconv \
-    php7-imagick \
-    php7-intl \
-    php7-json \
-    php7-mbstring \
-    php7-memcached \
-    php7-mcrypt \
-    php7-mysqlnd \
-    php7-opcache \
-    php7-openssl \
-    php7-pcntl \
-    php7-pdo \
-    php7-pdo_mysql \
-    php7-pear \
-    php7-phar \
-    php7-posix \
-    php7-pspell \
-    php7-pecl-redis \
-    #php7-redis \
-    #php7-session \
-    php7-shmop \
-    php7-simplexml \
-    php7-soap \
-    php7-sockets \
-    #php7-solr
-    php7-tokenizer \
-    #php7-wddx \
-    php7-xml \
-    php7-xmlreader \
-    php7-xmlwriter \
-    php7-zip \
-    php7-zlib \    
-    php7-oauth \
-    php7-mysqli \
-    php7-xdebug \
-    php7-xsl \
-    libssh2-dev \
-    shadow && \
-    apk --no-cache add --update \
-    --repository "$ALPINE_TESTING_REPO_MIRROR/testing" \
-    #php7-stats \
-    mlocate && \
-    apk --no-cache add --update --repository "$ALPINE_REPO_MIRROR/main" \
-    apache2 \
-    apache2-proxy \
-    apache2-utils \
-    openssl \
-    mysql-client \
-    git \
-    curl \
-    grep \
-    wget \
-    which \
-    tar \
-    pwgen \
-    bash \
-    unzip \
-    openrc \
-    fcgi \
-    postfix \
-    cyrus-sasl \
-    cyrus-sasl-plain \
-    mailx \
-    ncurses 
+RUN apk --no-cache add --update \
+	patch \
+	icu-libs \
+	shadow \
+	apache2 \
+	apache2-proxy \
+	apache2-utils \
+	openssl \
+	mysql-client \
+	git \
+	curl \
+	grep \
+	wget \
+	which \
+	tar \
+	pwgen \
+	bash \
+	unzip \
+	openrc \
+	fcgi \
+	postfix \
+	cyrus-sasl \
+#	cyrus-sasl-plain \
+	mailx \
+	ncurses 
+	#zlib 
 
-RUN apk --no-cache add --update py3-wheel gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions bcmath calendar Core ctype curl date dom exif fileinfo filter ftp gettext gmp iconv imagick json gd redis intl imap exif bz2 mbstring imap zip soap pdo pdo_mysql pdo_pgsql pgsql Phar mcrypt mysqlnd OAuth OPcache openssl pcntl mysqli phar posix pspell session shmop SimpleXML soap sockets solr SPL standard xml xmlreader xmlwriter zip zlib ssh2 xsl @composer-2.0.10
+
+#RUN apk upgrade --no-cache --update-cache --available && \
+#    apk --no-cache add --update \
+#    --repository "$ALPINE_REPO_MIRROR/community" \
+#    py3-pip \
+#    apk --no-cache add --update \
+#    --repository "$ALPINE_TESTING_REPO_MIRROR/testing" \
+#    mlocate
+
+RUN apk --no-cache add --update py3-pip rust cargo openssl-dev && python -m pip install -U pip && \
+	apk --no-cache add --update gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make
+
+RUN apk --no-cache add --update py3-wheel 
 
 # Python packages: junit awscli
 # removed run scope from PHP 7.4 releases
 #RUN pip --no-cache-dir install --upgrade pip \
-RUN pip --no-cache-dir install awscli junit_xml_output "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade \
-    && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
-    && wget -O /usr/bin/runscope.py https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/app.py
+RUN pip --no-cache-dir install awscli junit_xml_output "docker-compose==$DOCKER_COMPOSE_OVERRIDE" --upgrade 
+#    && pip --no-cache-dir install -r https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/requirements.txt \
+#    && wget -O /usr/bin/runscope.py https://raw.githubusercontent.com/Runscope/python-trigger-sample/master/app.py
 
-RUN apk del gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make
+RUN apk del gcc libffi libffi-dev python3-dev musl-dev libsodium-dev make rust cargo openssl-dev
 
 ENTRYPOINT bash
